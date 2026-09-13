@@ -1,8 +1,45 @@
-SELECT COUNT(*) AS name
+CREATING DATABASEAND TABLES
+## 1. Create a database named 'swiggy_data'
+##sql
+
+CREATE DATABASE swiggy_db;
+
+## 2. Create a table named 'swiggy' with appropriate columns
+##sql
+
+CREATE TABLE swiggy (
+    id INT PRIMARY KEY,
+    name VARCHAR(255),
+    city VARCHAR(100),
+    rating FLOAT,
+    rating_count VARCHAR(50),
+    cost VARCHAR(50),
+    cuisine VARCHAR(255),
+    lic_no VARCHAR(50),
+    link VARCHAR(255),
+    address TEXT,
+    menu TEXT
+);
+
+
+
+
+Data Exploration and Cleaning
+## 1. Count all restaurant records
+##sql
+
+SELECT COUNT(*) AS total_restaurants
 FROM swiggy;
+
+
+## 2. Count unique cities
+##sql
 
 SELECT COUNT(DISTINCT city) AS total_cities
 FROM swiggy;
+
+## 3. Review distinct values in important fields
+##sql
 
 SELECT DISTINCT rating
 FROM swiggy
@@ -16,6 +53,9 @@ SELECT DISTINCT rating_count
 FROM swiggy
 LIMIT 25;
 
+## 4. Check for missing values
+##sql
+
 SELECT
     SUM(CASE WHEN id IS NULL OR id = '' THEN 1 ELSE 0 END) AS missing_id,
     SUM(CASE WHEN name IS NULL OR name = '' THEN 1 ELSE 0 END) AS missing_name,
@@ -23,6 +63,9 @@ SELECT
     SUM(CASE WHEN rating IS NULL OR rating = '' THEN 1 ELSE 0 END) AS missing_rating,
     SUM(CASE WHEN cuisine IS NULL OR cuisine = '' THEN 1 ELSE 0 END) AS missing_cuisine
 FROM swiggy;
+
+## 5. Create cleaned numeric fields for analysis
+##sql
 
 SELECT
     id,
@@ -51,12 +94,18 @@ SELECT
     menu
 FROM swiggy;
 
+## 6. Restaurant count by city
+##sql
+
 SELECT
     city,
     COUNT(*) AS restaurant_count
 FROM swiggy
 GROUP BY city
 ORDER BY restaurant_count DESC;
+
+## 7. Average rating by city
+##sql
 
 SELECT
     city,
@@ -69,14 +118,20 @@ GROUP BY city
 HAVING COUNT(*) >= 10
 ORDER BY average_rating DESC;
 
+## 8.Restaurants with unavailable ratings
+##sql
+
 SELECT
     COUNT(*) AS restaurants_without_rating
 FROM swiggy
 WHERE rating IS NULL
    OR rating = '--'
    OR rating = '';
-   
-   SELECT
+
+## 9. Most common cuisine lables
+##sql
+
+SELECT
     cuisine,
     COUNT(*) AS restaurant_count
 FROM swiggy
@@ -86,6 +141,12 @@ GROUP BY cuisine
 ORDER BY restaurant_count DESC
 Limit 20;
 
+
+BUSINESS ANALYSIS QUESTIONS
+
+## 1. Which cities have the most restaurants?
+##sql
+
 SELECT
     city,
     COUNT(*) AS total_restaurants
@@ -93,6 +154,9 @@ FROM swiggy
 GROUP BY city
 ORDER BY total_restaurants DESC
 LIMIT 10;
+
+## 2.Which restaurants have the highest ratings?
+##sql
 
 SELECT
     name,
@@ -105,6 +169,9 @@ WHERE rating IS NOT NULL
   AND rating <> '--'
 ORDER BY rating DESC
 LIMIT 20;
+
+## 3. Which highly rated restaurants also have meaningful review volumes?
+##sql
 
 SELECT
     name,
@@ -141,7 +208,10 @@ WHERE rating >= 4.0
   AND rating_count != ''
 ORDER BY rating DESC, CAST(REPLACE(rating_count, '+', '') AS UNSIGNED) DESC
 LIMIT 10;
-USE swiggy_db;
+
+
+## 4. What is the average rating of restaurants by city?
+##sql
 
 SELECT
     city,
@@ -153,6 +223,9 @@ WHERE rating <> '--'
 GROUP BY city
 HAVING COUNT(*) >= 10
 ORDER BY average_rating DESC;
+
+## 5. what are the most common cost ranges?
+##sql
 
 SELECT
     CASE
@@ -167,6 +240,9 @@ WHERE cost IS NOT NULL AND cost != ''
 GROUP BY price_segment
 ORDER BY restaurant_count DESC;
 
+## 6. Which cities offer the largest variety of cuisines?
+##sql
+
 SELECT
     city,
     COUNT(DISTINCT cuisine) AS cuisine_listing_count
@@ -176,6 +252,9 @@ WHERE cuisine IS NOT NULL
 GROUP BY city
 ORDER BY cuisine_listing_count DESC
 LIMIT 10;
+
+## 7.Which restaurants are available at the lowest listed cost?
+##sql
 
 SELECT
     name,
@@ -190,6 +269,8 @@ WHERE cost IS NOT NULL
 ORDER BY CAST(REPLACE(REPLACE(REPLACE(cost, 'INR ', ''), 'Rs. ', ''), ',', '') AS UNSIGNED) ASC
 LIMIT 20;
 
+## 8. How many restaurants are available in each rating band?
+##sql
 
 SELECT
     CASE
@@ -204,6 +285,9 @@ FROM swiggy
 GROUP BY rating_band
 ORDER BY restaurant_count DESC;
 
+## 9. Which cities have the highest average ratings and high availability of restaurants?
+##sql
+
 SELECT
     city,
     COUNT(*) AS restaurant_count,
@@ -215,6 +299,10 @@ GROUP BY city
 HAVING COUNT(*) >= 25
    AND AVG(CAST(rating AS REAL)) >= 4.0
 ORDER BY average_rating DESC, restaurant_count DESC;
+
+
+## 10. Which cuisine listings apper most frequently?\
+##sql
 
 SELECT
     cuisine,
